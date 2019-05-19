@@ -182,6 +182,12 @@ void drawMesh(Context &ctx, GLuint program, const MeshVAO &meshVAO)
     glm::mat4 mv = view * model;
     glm::mat4 mvp = projection * mv;
     // ...
+    // Light
+    glm::vec3 light_src = glm::vec3(0, 3, 3);
+    glm::vec3 ambient_color = glm::vec3(0, 0, 1);
+    glm::vec3 diffuse_color = glm::vec3(0, 1, 0);
+    glm::vec3 specular_color = glm::vec3(1, 0, 0);
+
 
     // Activate program
     glUseProgram(program);
@@ -193,6 +199,10 @@ void drawMesh(Context &ctx, GLuint program, const MeshVAO &meshVAO)
     glUniformMatrix4fv(glGetUniformLocation(program, "u_mv"), 1, GL_FALSE, &mv[0][0]);
     glUniformMatrix4fv(glGetUniformLocation(program, "u_mvp"), 1, GL_FALSE, &mvp[0][0]);
     glUniform1f(glGetUniformLocation(program, "u_time"), ctx.elapsed_time);
+    glUniformMatrix3fv(glGetUniformLocation(program, "u_light_src"), 1, GL_FALSE, &light_src[0]);
+    glUniformMatrix3fv(glGetUniformLocation(program, "u_ambient_color"), 1, GL_FALSE, &ambient_color[0]);
+    glUniformMatrix3fv(glGetUniformLocation(program, "u_diffuse_color"), 1, GL_FALSE, &diffuse_color[0]);
+    glUniformMatrix3fv(glGetUniformLocation(program, "u_specular_color"), 1, GL_FALSE, &specular_color[0]);
     // ...
 
     // Draw!
