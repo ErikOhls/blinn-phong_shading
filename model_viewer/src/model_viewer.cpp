@@ -167,7 +167,7 @@ void init(Context &ctx)
     createMeshVAO(ctx, ctx.mesh, &ctx.meshVAO);
 
     // Load cubemap texture(s)
-    // ...
+    ctx.cubemap = loadCubemap(cubemapDir() + "/RomeChurch/");
 
     initializeTrackball(ctx);
 }
@@ -192,7 +192,9 @@ void drawMesh(Context &ctx, GLuint program, const MeshVAO &meshVAO)
     glUseProgram(program);
 
     // Bind textures
-    // ...
+    int texture = 0;
+    glActiveTexture(ctx.cubemap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, ctx.cubemap);
 
     // Pass uniforms
     glUniformMatrix4fv(glGetUniformLocation(program, "u_mv"), 1, GL_FALSE, &mv[0][0]);
@@ -202,7 +204,7 @@ void drawMesh(Context &ctx, GLuint program, const MeshVAO &meshVAO)
     glUniform3fv(glGetUniformLocation(program, "u_ambient_color"), 1, &ambient_color[0]);
     glUniformMatrix3fv(glGetUniformLocation(program, "u_diffuse_color"), 1, GL_FALSE, &diffuse_color[0]);
     glUniformMatrix3fv(glGetUniformLocation(program, "u_specular_color"), 1, GL_FALSE, &specular_color[0]);
-    // ...
+    glUniform1i(glGetUniformLocation(program, "u_cubemap"), 0);
 
     // Draw!
     glBindVertexArray(meshVAO.vao);
@@ -358,6 +360,8 @@ int main(void)
         display(ctx);
         ImGui::Render();
         glfwSwapBuffers(ctx.window);
+
+        // GUI Here
     }
 
     // Shutdown

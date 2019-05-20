@@ -4,6 +4,9 @@
 in vec3 L;
 in vec3 N;
 in vec3 V;
+in vec3 R;
+
+uniform samplerCube u_cubemap;
 /*
 uniform vec3 u_diffuse_color;
 uniform vec3 u_specular_color;
@@ -30,6 +33,7 @@ void main()
     vec3 u_ambient_color  = vec3(1.0f, 0.0f, 0.0f);
     vec3 u_light_color    = vec3(0.0f, 1.0f, 0.0f);
     float u_specular_power = 100.0f;
+    vec3 cubed_color = texture(u_cubemap, R).rgb;
     /*
     vec3 out_color = vec3(0.0f);
     out_color += u_ambient_color;
@@ -59,10 +63,11 @@ void main()
     vec3 Is = normalization * pow(max(0.0, dot(N, H)), u_specular_power) * u_specular_color * u_light_color;
 
     I += Is;
+    //I += cubed_color;
 
     I = pow(I, vec3(1.0/2.2));
 
-    frag_color = vec4(I, 1.0);
+    frag_color = vec4(cubed_color, 1.0);
 
 }
 

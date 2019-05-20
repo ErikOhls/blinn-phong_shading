@@ -8,6 +8,7 @@ layout(location = 1) in vec3 a_normal;
 out vec3 N;
 out vec3 L;
 out vec3 V;
+out vec3 R;
 
 uniform mat4 u_mvp;
 uniform mat4 u_mv;
@@ -23,6 +24,8 @@ void main()
     L = normalize(u_light_src - position_eye);
     // View normal
     V = position_eye * -1.0f;
+    // Reflection vector
+    R = reflect(-V, N);
 
     gl_Position = u_mvp * a_position;
 }
