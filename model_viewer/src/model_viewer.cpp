@@ -57,9 +57,10 @@ struct Context {
     GLuint defaultVAO;
     GLuint cubemap[8];
     float elapsed_time;
+    glm::vec3 diff_color = glm::vec3(0.0f, 0.5f, 0.5f);
     int cube_res;
     bool gamma_on = true;
-    bool cube_on;
+    bool cube_on = false;
 };
 
 // Returns the value of an environment variable
@@ -195,7 +196,8 @@ void drawMesh(Context &ctx, GLuint program, const MeshVAO &meshVAO)
     // Light colors
     glm::vec3 light_src      = glm::vec3(2.0f, 0.88f, 3.19f);
     glm::vec3 ambient_color  = glm::vec3(1.0f, 0.0f, 0.0f);
-    glm::vec3 diffuse_color  = glm::vec3(0.0f, 0.5f, 0.5f);
+    //glm::vec3 diffuse_color  = ctx.diff_color;
+    glm::vec3 diffuse_color  = glm::vec3(0.5f, 0.5f, 0.0f);
     glm::vec3 specular_color = glm::vec3(0.5f, 0.5f, 0.0f);
     glm::vec3 light_color    = glm::vec3(0.0f, 1.0f, 0.0f);
     float specular_power     = 100.0f;
@@ -374,7 +376,7 @@ int main(void)
         ctx.elapsed_time = glfwGetTime();
         ImGui_ImplGlfwGL3_NewFrame();
 
-        //GUIs
+        ImGui::ColorEdit3("Diffuse color", &ctx.diff_color[0]);
         ImGui::Checkbox("Gamma", &ctx.gamma_on);
         ImGui::Checkbox("Cube map", &ctx.cube_on);
         ImGui::SliderInt("Cube power", &ctx.cube_res, 0, 7);

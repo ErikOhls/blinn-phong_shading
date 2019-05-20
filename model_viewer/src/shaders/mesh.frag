@@ -9,6 +9,7 @@ in vec3 R;
 uniform samplerCube u_cubemap;
 uniform bool u_cube_on;
 uniform bool u_gamma_on;
+uniform bool u_diff_on;
 
 uniform vec3 u_diffuse_color;
 uniform vec3 u_specular_color;
@@ -38,7 +39,7 @@ void main()
     // Diffuse
     vec3 tmp = (u_diffuse_color * u_light_color) * diffuse(L, N);
     out_color += tmp;
-
+    
     // Specular
     tmp = V + L;
     vec3 H = tmp / length(tmp);
