@@ -64,6 +64,8 @@ struct Context {
     bool normals_on= true;
 };
 
+static float zoomFactor;
+
 // Returns the value of an environment variable
 std::string getEnvVar(const std::string &name)
 {
@@ -192,6 +194,8 @@ void drawMesh(Context &ctx, GLuint program, const MeshVAO &meshVAO)
     glm::mat4 model = trackballGetRotationMatrix(ctx.trackball);
     glm::mat4 view = glm::mat4();
     glm::mat4 projection = glm::ortho(-ctx.aspect, ctx.aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+    //glm::mat4 projection = glm::ortho(-ctx.aspect * zoomFactor, ctx.aspect * zoomFactor, -1.0f * zoomFactor, 1.0f * zoomFactor, -1.0f, 1.0f);
+    //glm::mat4 projection = glm::perspective(10.0f * zoomFactor, (float) ctx.width / (float) ctx.height, 0.01f, 100.0f);
     glm::mat4 mv = view * model;
     glm::mat4 mvp = projection * mv;
     // Light colors
@@ -330,6 +334,11 @@ void resizeCallback(GLFWwindow* window, int width, int height)
     ctx->trackball.center = glm::vec2(width, height) / 2.0f;
     glViewport(0, 0, width, height);
 }
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    zoomFactor += yoffset;
+    std::cout << zoomFactor;
+}
 
 int main(void)
 {
@@ -371,6 +380,7 @@ int main(void)
     glBindVertexArray(ctx.defaultVAO);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     init(ctx);
+    glfwSetScrollCallback(ctx.window, scroll_callback);
 
     // Start rendering loop
     while (!glfwWindowShouldClose(ctx.window)) {
