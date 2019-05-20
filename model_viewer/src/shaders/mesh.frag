@@ -5,11 +5,13 @@ in vec3 L;
 in vec3 N;
 in vec3 V;
 in vec3 R;
+in vec3 v_normal;
 
 uniform samplerCube u_cubemap;
 uniform bool u_cube_on;
 uniform bool u_gamma_on;
 uniform bool u_diff_on;
+uniform bool u_normals_on;
 
 uniform vec3 u_diffuse_color;
 uniform vec3 u_specular_color;
@@ -57,6 +59,13 @@ void main()
         frag_color = vec4(cubed_color, 1.0);
     }
 
+    //normals
+    
+    if (u_normals_on){
+        vec3 N= normalize(v_normal);
+        frag_color = vec4(0.5*N+0.5, 1.0);
+    }
+    
 }
 
 

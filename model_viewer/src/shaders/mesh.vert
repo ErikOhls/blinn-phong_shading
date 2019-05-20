@@ -9,6 +9,7 @@ out vec3 N;
 out vec3 L;
 out vec3 V;
 out vec3 R;
+out vec3 v_normal;
 
 uniform mat4 u_mvp;
 uniform mat4 u_mv;
@@ -26,6 +27,8 @@ void main()
     V = position_eye * -1.0f;
     // Reflection vector
     R = reflect(-V, N);
+    //v-normal
+    v_normal = a_normal;
 
     gl_Position = u_mvp * a_position;
 }

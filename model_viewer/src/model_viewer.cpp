@@ -61,6 +61,7 @@ struct Context {
     int cube_res;
     bool gamma_on = true;
     bool cube_on = false;
+    bool normals_on= true;
 };
 
 // Returns the value of an environment variable
@@ -223,6 +224,7 @@ void drawMesh(Context &ctx, GLuint program, const MeshVAO &meshVAO)
     // Options
     glUniform1i(glGetUniformLocation(program, "u_cube_on"), ctx.cube_on);
     glUniform1i(glGetUniformLocation(program, "u_gamma_on"), ctx.gamma_on);
+    glUniform1i(glGetUniformLocation(program, "u_normals_on"), ctx.normals_on);
 
     // Draw!
     glBindVertexArray(meshVAO.vao);
@@ -380,6 +382,7 @@ int main(void)
         ImGui::Checkbox("Gamma", &ctx.gamma_on);
         ImGui::Checkbox("Cube map", &ctx.cube_on);
         ImGui::SliderInt("Cube power", &ctx.cube_res, 0, 7);
+        ImGui::Checkbox("Normals", &ctx.normals_on);
 
         display(ctx);
         ImGui::Render();
