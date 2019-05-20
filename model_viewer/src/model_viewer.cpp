@@ -55,8 +55,11 @@ struct Context {
     Mesh mesh;
     MeshVAO meshVAO;
     GLuint defaultVAO;
-    GLuint cubemap;
+    GLuint cubemap[8];
     float elapsed_time;
+    int cube_res;
+    bool gamma_on = true;
+    bool cube_on;
 };
 
 // Returns the value of an environment variable
@@ -167,7 +170,15 @@ void init(Context &ctx)
     createMeshVAO(ctx, ctx.mesh, &ctx.meshVAO);
 
     // Load cubemap texture(s)
-    ctx.cubemap = loadCubemap(cubemapDir() + "/RomeChurch/");
+    std::string option = "/RomeChurch/prefiltered/";
+    ctx.cubemap[0] = loadCubemap(cubemapDir() + option + "/0.125/");
+    ctx.cubemap[1] = loadCubemap(cubemapDir() + option + "/0.5/");
+    ctx.cubemap[2] = loadCubemap(cubemapDir() + option + "/2/");
+    ctx.cubemap[3] = loadCubemap(cubemapDir() + option + "/8/");
+    ctx.cubemap[4] = loadCubemap(cubemapDir() + option + "/32/");
+    ctx.cubemap[5] = loadCubemap(cubemapDir() + option + "/128/");
+    ctx.cubemap[6] = loadCubemap(cubemapDir() + option + "/512/");
+    ctx.cubemap[7] = loadCubemap(cubemapDir() + option + "/2048/");
 
     initializeTrackball(ctx);
 }
@@ -182,19 +193,19 @@ void drawMesh(Context &ctx, GLuint program, const MeshVAO &meshVAO)
     glm::mat4 mv = view * model;
     glm::mat4 mvp = projection * mv;
     // Light colors
-    glm::vec3 light_src = glm::vec3(2.0f, 0.88f, 3.19f);
-    glm::vec3 ambient_color = glm::vec3(0, 0, 1);
-    glm::vec3 diffuse_color = glm::vec3(0, 1, 0);
-    glm::vec3 specular_color = glm::vec3(1, 0, 0);
-
+    glm::vec3 light_src      = glm::vec3(2.0f, 0.88f, 3.19f);
+    glm::vec3 ambient_color  = glm::vec3(1.0f, 0.0f, 0.0f);
+    glm::vec3 diffuse_color  = glm::vec3(0.0f, 0.5f, 0.5f);
+    glm::vec3 specular_color = glm::vec3(0.5f, 0.5f, 0.0f);
+    glm::vec3 light_color    = glm::vec3(0.0f, 1.0f, 0.0f);
+    float specular_power     = 100.0f;
 
     // Activate program
     glUseProgram(program);
 
     // Bind textures
-    int texture = 0;
-    glActiveTexture(ctx.cubemap);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, ctx.cubemap);
+    glActiveTexture(ctx.cubemap[ctx.cube_res]);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, ctx.cubemap[ctx.cube_res]);
 
     // Pass uniforms
     glUniformMatrix4fv(glGetUniformLocation(program, "u_mv"), 1, GL_FALSE, &mv[0][0]);
@@ -202,9 +213,14 @@ void drawMesh(Context &ctx, GLuint program, const MeshVAO &meshVAO)
     glUniform1f(glGetUniformLocation(program, "u_time"), ctx.elapsed_time);
     glUniform3fv(glGetUniformLocation(program, "u_light_src"), 1, &light_src[0]);
     glUniform3fv(glGetUniformLocation(program, "u_ambient_color"), 1, &ambient_color[0]);
-    glUniformMatrix3fv(glGetUniformLocation(program, "u_diffuse_color"), 1, GL_FALSE, &diffuse_color[0]);
-    glUniformMatrix3fv(glGetUniformLocation(program, "u_specular_color"), 1, GL_FALSE, &specular_color[0]);
+    glUniform3fv(glGetUniformLocation(program, "u_diffuse_color"), 1, &diffuse_color[0]);
+    glUniform3fv(glGetUniformLocation(program, "u_specular_color"), 1, &specular_color[0]);
+    glUniform3fv(glGetUniformLocation(program, "u_light_color"), 1, &specular_color[0]);
+    glUniform1f(glGetUniformLocation(program, "u_specular_power"), specular_power);
     glUniform1i(glGetUniformLocation(program, "u_cubemap"), 0);
+    // Options
+    glUniform1i(glGetUniformLocation(program, "u_cube_on"), ctx.cube_on);
+    glUniform1i(glGetUniformLocation(program, "u_gamma_on"), ctx.gamma_on);
 
     // Draw!
     glBindVertexArray(meshVAO.vao);
@@ -357,11 +373,15 @@ int main(void)
         glfwPollEvents();
         ctx.elapsed_time = glfwGetTime();
         ImGui_ImplGlfwGL3_NewFrame();
+
+        //GUIs
+        ImGui::Checkbox("Gamma", &ctx.gamma_on);
+        ImGui::Checkbox("Cube map", &ctx.cube_on);
+        ImGui::SliderInt("Cube power", &ctx.cube_res, 0, 7);
+
         display(ctx);
         ImGui::Render();
         glfwSwapBuffers(ctx.window);
-
-        // GUI Here
     }
 
     // Shutdown
