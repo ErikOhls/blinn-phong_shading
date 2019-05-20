@@ -413,7 +413,7 @@ int main(void)
         ImGui::Checkbox("Cube map", &ctx.cube_on);
         ImGui::SliderInt("Cube power", &ctx.cube_res, 0, 7);
         ImGui::Checkbox("Normals", &ctx.normals_on);
-        ImGui::SliderFloat3("Light position", &ctx.light_pos, 0.2f, 10.0f, "%.2f", 1.0f);
+        ImGui::SliderFloat3("Light position", (float*) &ctx.light_pos, 0.2f, 10.0f, "%.2f", 1.0f);
        
     
         
