@@ -58,10 +58,12 @@ struct Context {
     GLuint cubemap[8];
     float elapsed_time;
     glm::vec3 diff_color = glm::vec3(0.0f, 0.5f, 0.5f);
+    bool diffuse_on=true;
     int cube_res;
     bool gamma_on = true;
     bool cube_on = false;
     bool normals_on= true;
+    
 };
 
 static float zoomFactor;
@@ -229,6 +231,7 @@ void drawMesh(Context &ctx, GLuint program, const MeshVAO &meshVAO)
     glUniform1i(glGetUniformLocation(program, "u_cube_on"), ctx.cube_on);
     glUniform1i(glGetUniformLocation(program, "u_gamma_on"), ctx.gamma_on);
     glUniform1i(glGetUniformLocation(program, "u_normals_on"), ctx.normals_on);
+    glUniform1i(glGetUniformLocation(program, "u_diffuse_on"), ctx.diffuse_on);
 
     // Draw!
     glBindVertexArray(meshVAO.vao);
@@ -389,10 +392,12 @@ int main(void)
         ImGui_ImplGlfwGL3_NewFrame();
 
         ImGui::ColorEdit3("Diffuse color", &ctx.diff_color[0]);
+        ImGui::Checkbox("Diffuse Light", &ctx.diffuse_on);
         ImGui::Checkbox("Gamma", &ctx.gamma_on);
         ImGui::Checkbox("Cube map", &ctx.cube_on);
         ImGui::SliderInt("Cube power", &ctx.cube_res, 0, 7);
         ImGui::Checkbox("Normals", &ctx.normals_on);
+        
 
         display(ctx);
         ImGui::Render();
