@@ -58,11 +58,16 @@ struct Context {
     GLuint cubemap[8];
     float elapsed_time;
     glm::vec3 diff_color = glm::vec3(0.0f, 0.5f, 0.5f);
-    bool diffuse_on=true;
+    glm::vec3 amb_color = glm::vec3(1.0f, 0.0f, 0.0f);
+    glm::vec3 spec_color = glm::vec3(0.5f, 0.5f, 0.0f);
     int cube_res;
     bool gamma_on = true;
     bool cube_on = false;
-    bool normals_on= true;
+    bool normals_on= false;
+    bool diffuse_on=true;
+    bool amb_on=true;
+    bool spec_on=true;
+
     
 };
 
@@ -202,11 +207,12 @@ void drawMesh(Context &ctx, GLuint program, const MeshVAO &meshVAO)
     glm::mat4 mvp = projection * mv;
     // Light colors
     glm::vec3 light_src      = glm::vec3(2.0f, 0.88f, 3.19f);
-    glm::vec3 ambient_color  = glm::vec3(1.0f, 0.0f, 0.0f);
-    //glm::vec3 diffuse_color  = ctx.diff_color;
-    glm::vec3 diffuse_color  = glm::vec3(0.5f, 0.5f, 0.0f);
-    glm::vec3 specular_color = glm::vec3(0.5f, 0.5f, 0.0f);
+    glm::vec3 ambient_color  = ctx.amb_color;
+    glm::vec3 diffuse_color  = ctx.diff_color;
+    //glm::vec3 diffuse_color  = glm::vec3(0.5f, 0.5f, 0.0f);
+    glm::vec3 specular_color = ctx.spec_color;
     glm::vec3 light_color    = glm::vec3(0.0f, 1.0f, 0.0f);
+
     float specular_power     = 100.0f;
 
     // Activate program
@@ -232,6 +238,10 @@ void drawMesh(Context &ctx, GLuint program, const MeshVAO &meshVAO)
     glUniform1i(glGetUniformLocation(program, "u_gamma_on"), ctx.gamma_on);
     glUniform1i(glGetUniformLocation(program, "u_normals_on"), ctx.normals_on);
     glUniform1i(glGetUniformLocation(program, "u_diffuse_on"), ctx.diffuse_on);
+    glUniform1i(glGetUniformLocation(program, "u_amb_on"), ctx.amb_on);
+    glUniform1i(glGetUniformLocation(program, "u_spec_on"), ctx.spec_on);
+
+
 
     // Draw!
     glBindVertexArray(meshVAO.vao);
@@ -390,13 +400,20 @@ int main(void)
         glfwPollEvents();
         ctx.elapsed_time = glfwGetTime();
         ImGui_ImplGlfwGL3_NewFrame();
-
+        //GuiS
         ImGui::ColorEdit3("Diffuse color", &ctx.diff_color[0]);
         ImGui::Checkbox("Diffuse Light", &ctx.diffuse_on);
+        ImGui::ColorEdit3("Ambient color", &ctx.amb_color[0]);
+        ImGui::Checkbox("Ambient light", &ctx.amb_on);
+        ImGui::ColorEdit3("Specular color", &ctx.spec_color[0]);
+        ImGui::Checkbox("Specular lights", &ctx.spec_on);
         ImGui::Checkbox("Gamma", &ctx.gamma_on);
         ImGui::Checkbox("Cube map", &ctx.cube_on);
         ImGui::SliderInt("Cube power", &ctx.cube_res, 0, 7);
         ImGui::Checkbox("Normals", &ctx.normals_on);
+       
+    
+        
         
 
         display(ctx);

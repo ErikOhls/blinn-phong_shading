@@ -13,6 +13,8 @@ uniform bool u_gamma_on;
 uniform bool u_diff_on;
 uniform bool u_normals_on;
 uniform bool u_diffuse_on;
+uniform bool u_amb_on;
+uniform bool u_spec_on;
 
 uniform vec3 u_diffuse_color;
 uniform vec3 u_specular_color;
@@ -38,9 +40,11 @@ void main()
     // Ambient
     vec3 out_color = vec3(0.0f);
     vec3 tmp= vec3(0.0f);
-    out_color += u_ambient_color;
-    //vec3 tmp= vec3(0.0f);
 
+    if (u_amb_on){
+        out_color += u_ambient_color;
+    }
+   
     // Diffuse
     if (u_diffuse_on){
         tmp = (u_diffuse_color * u_light_color) * diffuse(L, N);
@@ -49,10 +53,11 @@ void main()
     }
     
     // Specular
-    tmp = V + L;
-    vec3 H = tmp / length(tmp);
-    out_color += specular_normalized(N, H) * u_specular_color * u_light_color;
-
+    if (u_spec_on){
+        tmp = V + L;
+        vec3 H = tmp / length(tmp);
+        out_color += specular_normalized(N, H) * u_specular_color * u_light_color;
+    }
     if(u_gamma_on){
         out_color = pow(out_color, vec3(1 / 2.2));
     }
